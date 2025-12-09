@@ -31,14 +31,14 @@ class DBHelper {
     await db.execute('''
       CREATE TABLE reports(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT,
-        description TEXT,
-        photoPath TEXT,
+        judul TEXT,
+        deskripsi TEXT,
+        foto TEXT,
         latitude REAL,
         longitude REAL,
         status INTEGER,
         officerNotes TEXT,
-        officerPhotoPath TEXT
+        officerFoto TEXT
       )
     ''');
   }
