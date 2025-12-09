@@ -9,7 +9,6 @@ import 'package:path/path.dart' as p;
 import '../models/report_model.dart';
 import '../providers/report_notifier.dart';
 
-// State Provider untuk menyimpan foto sementara & koordinat
 final tempPhotoProvider = StateProvider<File?>((ref) => null);
 final tempLocationProvider = StateProvider<Position?>((ref) => null);
 
@@ -18,31 +17,25 @@ class AddReportScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // --- State Local untuk Form ---
     final titleController = TextEditingController();
     final descController = TextEditingController();
     final photoFile = ref.watch(tempPhotoProvider);
     final currentPosition = ref.watch(tempLocationProvider);
 
-    // --- FUNGSI KAMERA (MAHASISWA 2) ---
     Future<void> _pickImage(ImageSource source) async {
       final picker = ImagePicker();
       final XFile? pickedFile = await picker.pickImage(source: source);
       if (pickedFile != null) {
-        // Simpan file sementara (penting untuk submit)
         ref.read(tempPhotoProvider.notifier).state = File(pickedFile.path);
       }
     }
 
-    // --- FUNGSI GPS (MAHASISWA 2) ---
     Future<void> _getCurrentLocation() async {
       bool serviceEnabled;
       LocationPermission permission;
 
-      // Cek izin/servis
       serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        // Tampilkan pesan error
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Location services are disabled.')));
         return;
       }
@@ -56,20 +49,17 @@ class AddReportScreen extends ConsumerWidget {
         }
       }
 
-      // Ambil lokasi
       final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
       ref.read(tempLocationProvider.notifier).state = position;
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Lokasi berhasil ditandai!')));
     }
 
-    // --- FUNGSI SUBMIT (MAHASISWA 2) ---
     Future<void> _submitReport() async {
       if (titleController.text.isEmpty || descController.text.isEmpty || photoFile == null || currentPosition == null) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Harap lengkapi semua data, foto, dan lokasi.')));
         return;
       }
       
-      // Salin foto ke direktori aplikasi untuk disimpan permanen
       final directory = await getApplicationDocumentsDirectory();
       final String fileName = p.basename(photoFile.path);
       final String newPath = p.join(directory.path, fileName);
@@ -84,10 +74,7 @@ class AddReportScreen extends ConsumerWidget {
         status: 0, 
       );
 
-      // Logika Insert ke Database menggunakan Riverpod
       await ref.read(reportListProvider.notifier).addReport(newReport);
-
-      // Reset state dan kembali
       ref.read(tempPhotoProvider.notifier).state = null;
       ref.read(tempLocationProvider.notifier).state = null;
       Navigator.pop(context);
@@ -109,7 +96,7 @@ class AddReportScreen extends ConsumerWidget {
             Center(
               child: photoFile == null
                   ? const Text('Belum ada foto bukti.')
-                  : Image.file(photoFile, height: 200, fit: BoxFit.cover), // Preview Foto
+                  : Image.file(photoFile, height: 200, fit: BoxFit.cover),
             ),
             const SizedBox(height: 10),
             Row(
@@ -129,7 +116,6 @@ class AddReportScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 20),
 
-            // Integrasi GPS
             const Text('Lokasi Laporan:', style: TextStyle(fontWeight: FontWeight.bold)),
             if (currentPosition != null)
               Text('Lat: ${currentPosition.latitude.toStringAsFixed(4)}, Long: ${currentPosition.longitude.toStringAsFixed(4)}'),

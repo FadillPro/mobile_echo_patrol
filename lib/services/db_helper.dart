@@ -1,6 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import '../models/report_model.dart'; // Import Model
+import '../models/report_model.dart';
 
 class DBHelper {
   static final DBHelper _instance = DBHelper._internal();
@@ -12,7 +12,6 @@ class DBHelper {
 
   DBHelper._internal();
 
-  // Inisialisasi Database Koneksi
   Future<Database> get database async {
     if (_database != null) return _database!;
     _database = await _initDB();
@@ -28,7 +27,6 @@ class DBHelper {
     );
   }
 
-  // Membuat Tabel
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
       CREATE TABLE reports(
@@ -45,7 +43,6 @@ class DBHelper {
     ''');
   }
 
-  // --- CRUD Operations (Implementasi dasar) ---
 
   Future<void> insertReport(ReportModel report) async {
     final db = await database;
