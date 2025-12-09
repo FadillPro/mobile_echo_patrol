@@ -1,27 +1,57 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
-import '/models/report_model.dart';
-import './db_helper.dart';
+import '../models/report_model.dart';
+import '../services/db_helper.dart';
 
-class ReportNotifier extends StateNotifier<AsyncValue<bool>> {
-  ReportNotifier() : super(const AsyncData(false));
+// Provider untuk DBHelper (Pastikan MAHASISWA 1 sudah mengimplementasi DBHelper)
+final dbHelperProvider = Provider((ref) => DBHelper());
 
-  final DBHelper _db = DBHelper();
+// AsyncNotifier untuk mengelola list laporan (MAHASISWA 2, 3, 4)
+class ReportListNotifier extends AsyncNotifier<List<ReportModel>> {
+  @override
+  Future<List<ReportModel>> build() async {
+    // Initial load: Panggil dari DB saat pertama kali diakses (MAHASISWA 3)
+    return ref.read(dbHelperProvider).getReports();
+  }
 
-  Future<void> insertReport(ReportModel report) async {
+  // CREATE Logic (MAHASISWA 2)
+  Future<void> addReport(ReportModel report) async {
+    // Set state ke loading sementara menunggu operasi DB
+    state = const AsyncValue.loading();
     try {
-      state = const AsyncLoading(); 
-
-      await _db.insertReport(report);
-
-      state = const AsyncData(true);
+      final db = ref.read(dbHelperProvider);
+      await db.insertReport(report);
+      // Re-fetch data dari DB setelah insert
+      state = AsyncValue.data(await db.getReports());
     } catch (e, st) {
-      state = AsyncError(e, st);
+      state = AsyncValue.error(e, st);
+    }
+  }
+  
+  // UPDATE Logic (MAHASISWA 4)
+  Future<void> updateReport(ReportModel report) async {
+    state = const AsyncValue.loading();
+    try {
+      final db = ref.read(dbHelperProvider);
+      await db.updateReport(report);
+      state = AsyncValue.data(await db.getReports());
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  // DELETE Logic (MAHASISWA 4)
+  Future<void> deleteReport(int id) async {
+    state = const AsyncValue.loading();
+    try {
+      final db = ref.read(dbHelperProvider);
+      await db.deleteReport(id);
+      state = AsyncValue.data(await db.getReports());
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
     }
   }
 }
 
-final reportNotifierProvider =
-    StateNotifierProvider<ReportNotifier, AsyncValue<bool>>(
-  (ref) => ReportNotifier(),
-);
+final reportListProvider = AsyncNotifierProvider<ReportListNotifier, List<ReportModel>>(() {
+  return ReportListNotifier();
+});
