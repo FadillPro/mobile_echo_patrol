@@ -30,6 +30,7 @@ class AddReportScreen extends ConsumerWidget {
       }
     }
 
+    
     Future<void> _getCurrentLocation() async {
       bool serviceEnabled;
       LocationPermission permission;
@@ -72,6 +73,8 @@ class AddReportScreen extends ConsumerWidget {
         latitude: currentPosition.latitude,
         longitude: currentPosition.longitude,
         status: 0, 
+        officerNotes: '',
+        officerFoto: '',
       );
 
       await ref.read(reportListProvider.notifier).addReport(newReport);
