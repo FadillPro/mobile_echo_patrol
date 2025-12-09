@@ -16,7 +16,7 @@ class LoginScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               const TextField(decoration: InputDecoration(labelText: 'Username')),
-              const TextField(decoration: InputDecoration(labelText: 'Password', obscureText: true)),
+              const TextField(decoration: InputDecoration(labelText: 'Password'), obscureText: true),
               const SizedBox(height: 20),
               // Tombol Login: Memanggil method login dari AuthNotifier
               ElevatedButton(
