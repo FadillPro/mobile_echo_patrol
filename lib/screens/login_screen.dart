@@ -18,10 +18,9 @@ class LoginScreen extends ConsumerWidget {
               const TextField(decoration: InputDecoration(labelText: 'Username')),
               const TextField(decoration: InputDecoration(labelText: 'Password'), obscureText: true),
               const SizedBox(height: 20),
-              // Tombol Login: Memanggil method login dari AuthNotifier
+          
               ElevatedButton(
                 onPressed: () {
-                  // Panggil .notifier untuk mengubah state
                   ref.read(authProvider.notifier).login();
                 },
                 child: const Text('Login'),
