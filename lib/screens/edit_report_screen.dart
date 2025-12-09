@@ -71,10 +71,12 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
       final updatedReport = widget.report.copyWith(
         status: 1,
         officerNotes: _officerNotes,
+        officerFoto: _officerImageFile!.path,
       );
 
       // 3. Update Database menggunakan DBHelper (SQFlite)
       await _dbHelper.updateReport(updatedReport);
+      
 
       ref.invalidate(reportListProvider);
 
