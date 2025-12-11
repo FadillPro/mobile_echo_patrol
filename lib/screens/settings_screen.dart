@@ -17,9 +17,9 @@ class SettingsScreen extends ConsumerWidget {
             onTap: () {
 
               ref.read(authProvider.notifier).logout();
+              Navigator.of(context).popUntil((route) => route.isFirst);
             },
           ),
-          // Pengaturan lain (Jika ada)
         ],
       ),
     );
